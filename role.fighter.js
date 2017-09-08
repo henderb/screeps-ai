@@ -19,7 +19,7 @@ var roleFighter = {
             resources -= 130;
         }
         while(resources >= 60) {
-            body.push(TOUGH);
+            body.unshift(TOUGH);
             body.push(MOVE);
             resources -= 60;
         }

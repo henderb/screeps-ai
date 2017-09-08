@@ -11,7 +11,7 @@ var roleContainerizer = {
         var body = [WORK,CARRY,MOVE];
         resources -= 200;
         while(resources >= 100) {
-            body.push(WORK);
+            body.unshift(WORK);
             resources -= 100;
         }
         if(resources >= 50) {

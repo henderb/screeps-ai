@@ -19,13 +19,13 @@ var roleRemoteHarvester = {
             cost += 250;
         }
         if(resources >= 100) {
-            body.push(CARRY);
-            body.push(MOVE);
+            body.unshift(CARRY);
+            body.unshift(MOVE);
             resources -= 100;
             cost += 100;
         }
         if(resources >= 50) {
-            body.push(MOVE);
+            body.unshift(MOVE);
             resources -= 50;
             cost += 50;
         }
