@@ -8,7 +8,7 @@ var roleTowerTender = {
     create: function(spawn, resources) {
         var body = [WORK,CARRY,MOVE];
         resources -= 200;
-        while(resources >= 100) {
+        if(resources >= 100) {
             body.push(CARRY);
             body.push(MOVE);
             resources -= 100;

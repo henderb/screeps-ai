@@ -4,8 +4,9 @@ var common = {
 
     /** @param {Creep} creep **/
     getEnergy: function(creep) {
-        var droppedEnergy = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 10)[0];
+        var droppedEnergy = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 8)[0];
         if(droppedEnergy) {
+            //console.log(creep.name + " heading to pickup droppedEnergy: " + droppedEnergy.pos)
             if(creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE){
                 creep.moveTo(droppedEnergy);
                 roads.recordUse(creep.body, creep.pos);
@@ -18,12 +19,14 @@ var common = {
                 }
             });
             if(container){
+                //console.log(creep.name + " heading to pickup from container: " + container.pos)
                 if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(container);
                     roads.recordUse(creep.body, creep.pos);
                 }
             } else {
                 var source = creep.pos.findClosestByPath(FIND_SOURCES);
+                //console.log(creep.name + " heading to pickup from source: " + source.pos)
                 if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source);
                     roads.recordUse(creep.body, creep.pos);
