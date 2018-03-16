@@ -8,6 +8,7 @@ var roleBuilder = {
     **/
     create: function(spawn, resources) {
         var body = [WORK,CARRY,MOVE];
+        resources = Math.min(resources, 1150)
         resources -= 200;
         while(resources >= 250) {
             body.push(WORK);

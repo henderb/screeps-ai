@@ -8,10 +8,12 @@ var roleRepairer = {
     create: function(spawn, resources) {
         var body = [WORK,CARRY,MOVE];
         resources -= 200;
-        while(resources >= 100) {
+        part_limit = 5;
+        while(resources >= 100 && part_limit > 0) {
             body.push(CARRY);
             body.push(MOVE);
-            resources -= 100;
+            resources -= 200;
+            part_limit -= 1;
         }
         if(resources >= 50) {
             body.push(MOVE);

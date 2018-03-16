@@ -9,11 +9,13 @@ var roleHarvester = {
     create: function(spawn, resources) {
         var body = [WORK,CARRY,MOVE];
         resources -= 200;
-        if(resources >= 200) {
+        part_limit = 2;
+        while(resources >= 200 && part_limit > 0) {
             body.push(WORK);
             body.push(CARRY);
             body.push(MOVE);
             resources -= 200;
+            part_limit -= 1;
         }
         if(resources >= 100) {
             body.push(CARRY);
