@@ -16,7 +16,7 @@ var roleTower = {
                 status = tower.heal(creep);
                 //console.log("Tower healing creep: " + creep + "; status: " + common.getErrorString(status));
             } else {
-                if(Game.cpu.bucket > 800 || console.log("Tower skipping repair due to low CPU")) {
+                if(Game.cpu.bucket > 800 || console.log(tower, "Tower skipping repair due to low CPU")) {
                     var closestDamagedStructure = false;
                     if(tower.energy > tower.energyCapacity * .75) {
                         for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 10) {

@@ -31,7 +31,7 @@ var roleFighter = {
         if(newName < 0) {
             newName = common.getErrorString(newName);
         }
-        console.log('Spawning new fighter: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new fighter: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/

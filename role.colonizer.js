@@ -6,6 +6,7 @@ var roleColonizer = {
         @param {int} resources 
     **/
     create: function(spawn, resources) {
+        resources = Math.min(resources, 850);
         var body = [CLAIM,MOVE];
         resources -= 650;
         while(resources >= 60) {
@@ -29,13 +30,14 @@ var roleColonizer = {
         if(newName < 0) {
             newName = common.getErrorString(newName);
         }
-        console.log('Spawning new colonizer: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new colonizer: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        if(creep.room.name != memory.target[room]) {
-            creep.moveTo(new RoomPosition(memory.target[x], memory.target[y], memory.target[room]));
+        if(creep.room.name != creep.memory.target['room']) {
+            dest = new RoomPosition(creep.memory.target['x'], creep.memory.target['y'], creep.memory.target['room']);
+            creep.moveTo(dest);
         } else {
             if(creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE){
                 creep.moveTo(creep.room.controller);
@@ -44,4 +46,4 @@ var roleColonizer = {
 	}
 };
 
-module.exports = roleContainerizer;
+module.exports = roleColonizer;

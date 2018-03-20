@@ -30,7 +30,7 @@ var roleBuilder = {
         if(newName < 0) {
             newName = common.getErrorString(newName);
         }
-        console.log('Spawning new builder: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new builder: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/
@@ -77,6 +77,10 @@ var roleBuilder = {
 	    else {
             common.getEnergy(creep);
 	    }
+
+        if(creep.memory.room != null && creep.memory.room != creep.room.name) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.room), { reusePath: 20 });
+        }
 	}
 };
 

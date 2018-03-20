@@ -35,7 +35,7 @@ var roleUpgrader = {
         if(newName < 0) {
             newName = common.getErrorString(newName);
         }
-        console.log('Spawning new upgrader: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new upgrader: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/

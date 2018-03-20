@@ -51,7 +51,7 @@ var roleRemoteHarvester = {
             Game.creeps[newName].memory.benefit = 0 - cost;
             console.log('New remoteHarvester picked room: ' + room);
         }
-        console.log('Spawning new remoteHarvester: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new remoteHarvester: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/

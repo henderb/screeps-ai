@@ -23,7 +23,7 @@ var roleRepairer = {
         if(newName < 0) {
             newName = common.getErrorString(newName);
         }
-        console.log('Spawning new repairer: ' + newName + ' with body ' + body);
+        console.log(spawn, 'Spawning new repairer: ' + newName + ' with body ' + body);
     },
 
     /** @param {Creep} creep **/
