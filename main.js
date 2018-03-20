@@ -102,7 +102,7 @@ module.exports.loop = function () {
                     }
                 }
 
-                current = _.filter(Game.creeps, (creep) => creep.memory.role == 'remoteHarvester' && creep.memory.home == spawn.room.name);
+                current = _.filter(Game.creeps, (creep) => creep.memory.role == 'remoteHarvester' && creep.memory.home['room'] == spawn.room.name);
                 if(!current || current.length < spawn.memory.units.remoteHarvester) {
                     roleRemoteHarvester.create(spawn, spawn.room.energyCapacityAvailable);
                 }
