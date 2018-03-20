@@ -54,6 +54,14 @@ var roleHarvester = {
                     creep.moveTo(target);
                     roads.recordUse(creep.body, creep.pos);
                 }
+            } else {
+                var target = creep.room.terminal;
+                if(target) {
+                    if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                        roads.recordUse(creep.body, creep.pos);
+                    }
+                }
             }
         } else {
             common.getEnergy(creep);

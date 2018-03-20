@@ -8,6 +8,7 @@ var roleBuilder = require('role.builder');
 var roleFighter = require('role.fighter');
 var roleTower = require('role.tower');
 var roleTowerTender = require('role.towertender');
+var roleMiner = require('role.miner');
 
 var roads = require('roads');
 
@@ -17,12 +18,13 @@ var fleet = {
 
 module.exports.loop = function () {
 
+    if(Game.cpu.bucket > 500) {
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
-    }
+    }}
 
     for(var spawnName in Game.spawns) {
         var spawn = Game.spawns[spawnName];
@@ -55,6 +57,9 @@ module.exports.loop = function () {
         }
         if(spawn.memory.units.upgrader == null) {
             spawn.memory.units.upgrader = spawn.room.find(FIND_SOURCES).length;
+        }
+        if(spawn.memory.units.miner == null) {
+            spawn.memory.units.miner = 0;
         }
 
         // Spawn new creeps
@@ -118,6 +123,11 @@ module.exports.loop = function () {
                         }
                     }
                 }
+
+                current = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner');
+                if(!current || current.length < spawn.memory.units.miner) {
+                    roleMiner.create(spawn, spawn.room.energyCapacityAvailable);
+                }
             }
         }
     }
@@ -155,7 +165,11 @@ module.exports.loop = function () {
         if(creep.memory.role == 'remoteHarvester') {
             roleRemoteHarvester.run(creep);
         }
+        if(creep.memory.role == 'miner') {
+            roleMiner.run(creep);
+        }
     }
 
     roads.decayUse()
+    console.log("End CPU Bucket: ", Game.cpu.bucket)
 }

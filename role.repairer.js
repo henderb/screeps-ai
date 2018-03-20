@@ -38,7 +38,7 @@ var roleRepairer = {
 
 	    if(creep.memory.building) {
             var target = false;
-            for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 2) {
+            for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 10) {
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return structure.structureType != STRUCTURE_ROAD && structure.hits < structure.hitsMax && structure.hits < maxHits;

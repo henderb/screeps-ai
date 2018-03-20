@@ -16,23 +16,26 @@ var roleTower = {
                 status = tower.heal(creep);
                 //console.log("Tower healing creep: " + creep + "; status: " + common.getErrorString(status));
             } else {
-                var closestDamagedStructure = false;
-                if(tower.energy > tower.energyCapacity * .75) {
-                    for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 2) {
-                        closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return (structure.structureType != STRUCTURE_ROAD && structure.hits < structure.hitsMax && structure.hits < maxHits)
-                                    || (structure.structureType == STRUCTURE_ROAD && Memory.roads[structure.room.name][structure.pos.x + ',' + structure.pos.y] > 1500 && structure.hits < structure.hitsMax && structure.hits < maxHits)
+                if(Game.cpu.bucket > 800 || console.log("Tower skipping repair due to low CPU")) {
+                    var closestDamagedStructure = false;
+                    if(tower.energy > tower.energyCapacity * .75) {
+                        for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 10) {
+                            closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                                filter: (structure) => {
+                                    return (structure.structureType != STRUCTURE_ROAD && structure.hits < structure.hitsMax && structure.hits < maxHits)
+                                        || (structure.structureType == STRUCTURE_ROAD && Memory.roads[structure.room.name][structure.pos.x + ',' + structure.pos.y] > 1500 && structure.hits < structure.hitsMax && structure.hits < maxHits)
+                                }
+                            });
+                            if(closestDamagedStructure) {
+                                //console.log("Tower went to maxHits ", maxHits)
+                                break;
                             }
-                        });
-                        if(closestDamagedStructure) {
-                            break;
                         }
                     }
-                }
-                if(closestDamagedStructure) {
-                    status = tower.repair(closestDamagedStructure);
-                    //console.log("Tower reparing structure: " + closestDamagedStructure.pos + "; status: " + common.getErrorString(status));
+                    if(closestDamagedStructure) {
+                        status = tower.repair(closestDamagedStructure);
+                        //console.log("Tower reparing structure: " + closestDamagedStructure.pos + "; status: " + common.getErrorString(status));
+                    }
                 }
             }
         }
