@@ -56,7 +56,7 @@ var roleHarvester = {
                 }
             } else {
                 var target = creep.room.terminal;
-                if(target) {
+                if(target && target.store.energy < 20000) {
                     if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target);
                         roads.recordUse(creep.body, creep.pos);

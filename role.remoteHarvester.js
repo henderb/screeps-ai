@@ -56,10 +56,10 @@ var roleRemoteHarvester = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        if(creep.memory.delivering && creep.carry.energy == 0) {
+        if(creep.memory.delivering && _.sum(creep.carry) == 0) {
             creep.memory.delivering = false;
 	    }
-	    if(!creep.memory.delivering && creep.carry.energy == creep.carryCapacity) {
+	    if(!creep.memory.delivering && _.sum(creep.carry) == creep.carryCapacity) {
 	        creep.memory.delivering = true;
 	    }
 
@@ -113,22 +113,37 @@ var roleRemoteHarvester = {
                     }
                 }
             }
-        } else {
-            target = new RoomPosition(creep.memory.target['x'], creep.memory.target['y'], creep.memory.target['room']);
-            if(creep.room.name != creep.memory.target['room']) {
-                creep.moveTo(target, { reusePath: 20 });
+        } else { // We are harvesting
+            var tombstone = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+                filter: (tombstone) => {
+                    return _.sum(tombstone.store) > 0;
+                }
+            })
+            if(tombstone) {
+                for(resourceType in tombstone.store) {
+                    result = creep.withdraw(tombstone, resourceType);
+                    //console.log("Janitor found tombstone", tombstone.pos, common.getErrorString(result));
+                    if(result == ERR_NOT_IN_RANGE){
+                        creep.moveTo(tombstone);
+                    }
+                }
             } else {
-                var source = target.lookFor(LOOK_SOURCES)[0];
-                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source);
-                    roads.recordUse(creep.body, creep.pos);
+                target = new RoomPosition(creep.memory.target['x'], creep.memory.target['y'], creep.memory.target['room']);
+                if(creep.room.name != creep.memory.target['room']) {
+                    creep.moveTo(target, { reusePath: 20 });
                 } else {
-                    source = creep.pos.findClosestByPath(FIND_SOURCES);
-                    if(source) {
-                        creep.memory.target['x'] = source.pos.x;
-                        creep.memory.target['y'] = source.pos.y;
+                    var source = target.lookFor(LOOK_SOURCES)[0];
+                    if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(source);
+                        roads.recordUse(creep.body, creep.pos);
                     } else {
-                        creep.moveTo(target, { reusePath: 20 });
+                        source = creep.pos.findClosestByPath(FIND_SOURCES);
+                        if(source) {
+                            creep.memory.target['x'] = source.pos.x;
+                            creep.memory.target['y'] = source.pos.y;
+                        } else {
+                            creep.moveTo(target, { reusePath: 20 });
+                        }
                     }
                 }
             }

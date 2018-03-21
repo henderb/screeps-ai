@@ -50,9 +50,12 @@ var roleBuilder = {
                 common.setCachedObject(creep, 'builder_building', target, 20);
             }
             if(target) {
+                result = creep.build(target);
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
-				}
+				} else if(result == ERR_INVALID_TARGET) {
+                    common.invalidateCachedObject(creep, 'builder_building');
+                }
             } else {
                 // Avoid burning cpu burst down to zero with the sort. 9000 might be in use it or loose it range.
                 if(Game.cpu.bucket >= 9000) {

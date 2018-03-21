@@ -17,6 +17,14 @@ var common = {
         }
     },
 
+    invalidateCached: function(creep, key) {
+        this.setCached(creep, key, 0, 0)
+    },
+
+    invalidateCachedObject: function(creep, key) {
+        this.setCached(creep, key, 0, 0)
+    },
+
     getCached: function(creep, key) {
         this.initCached(creep, key);
         if(creep.memory.cached[key]) {
@@ -28,7 +36,7 @@ var common = {
                 return ERR_NOT_FOUND;
             }
         } else {
-            this.setCached(creep, key, 0, 0)
+            this.invalidateCached(creep, key)
             //console.log('New cached key', creep, key);
             return ERR_NOT_FOUND;
         }

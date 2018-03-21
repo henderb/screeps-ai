@@ -36,11 +36,12 @@ var roleTowerTender = {
 	    if(creep.memory.delivering) {
             var target = common.getCachedObject(creep, 'towertender_filling');
             if(target == ERR_NOT_FOUND) {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return (structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                     }
                 });
+                target = targets.sort(function(a,b) { return a.energy - b.energy; })[0]
                 common.setCachedObject(creep, 'towertender_filling', target, 20);
             }
             if(target) {

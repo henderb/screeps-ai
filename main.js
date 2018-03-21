@@ -10,6 +10,7 @@ var roleTower = require('role.tower');
 var roleTowerTender = require('role.towertender');
 var roleMiner = require('role.miner');
 var roleColonizer = require('role.colonizer');
+var roleJanitor = require('role.janitor');
 
 var roads = require('roads');
 
@@ -65,6 +66,9 @@ module.exports.loop = function () {
             }
             if(spawn.memory.units.colonizer == null) {
                 spawn.memory.units.colonizer = 0;
+            }
+            if(spawn.memory.units.janitor == null) {
+                spawn.memory.units.janitor = 0;
             }
 
             // Spawn new creeps
@@ -134,6 +138,11 @@ module.exports.loop = function () {
                         roleMiner.create(spawn, spawn.room.energyCapacityAvailable);
                     }
 
+                    current = _.filter(Game.creeps, (creep) => creep.memory.role == 'janitor' && creep.room.name == spawn.room.name);
+                    if(!current || current.length < spawn.memory.units.janitor) {
+                        roleJanitor.create(spawn, spawn.room.energyCapacityAvailable);
+                    }
+
                     current = _.filter(Game.creeps, (creep) => creep.memory.role == 'colonizer');
                     if(!current || current.length < spawn.memory.units.colonizer) {
                         roleColonizer.create(spawn, spawn.room.energyCapacityAvailable);
@@ -183,38 +192,97 @@ module.exports.loop = function () {
         if(creep.memory.role == 'colonizer') {
             roleColonizer.run(creep);
         }
+        if(creep.memory.role == 'janitor') {
+            roleJanitor.run(creep);
+        }
     }
 
     roads.decayUse()
 
     // Trading
-    if(Game.time % 5 == 1) {
+    market_pricing = {
+        'energy': .035,
+        'power': 5,
+
+        'H': .075,
+        'O': .075,
+        'U': .075,
+        'L': .075,
+        'K': .075,
+        'Z': .075,
+        'X': .150,
+        'G': .300,
+
+        'OH': .150,
+        'ZK': .150,
+        'UL': .150,
+
+        'UH': .150,
+        'UO': .150,
+        'KH': .150,
+        'KO': .150,
+        'LH': .150,
+        'LO': .150,
+        'ZH': .150,
+        'ZO': .150,
+        'GH': .375,
+        'GO': .375,
+
+        'UH2O': .300,
+        'UHO2': .300,
+        'KH2O': .300,
+        'KHO2': .300,
+        'LH2O': .300,
+        'LHO2': .300,
+        'ZH2O': .300,
+        'ZHO2': .300,
+        'GH2O': .525,
+        'GHO2': .525,
+
+        'XUH2O': .450,
+        'XUHO2': .450,
+        'XKH2O': .450,
+        'XKHO2': .450,
+        'XLH2O': .450,
+        'XLHO2': .450,
+        'XZH2O': .450,
+        'XZHO2': .450,
+        'XGH2O': .675,
+        'XGHO2': .675,
+    }
+
+    if(Game.time % 11 == 1) {
         for(roomName in Game.rooms) {
             room = Game.rooms[roomName];
             if(room.terminal) {
                 energyAvailable = room.terminal.store.energy
                 for(resourceName in room.terminal.store) {
-                    if(resourceName == RESOURCE_ENERGY) {
+                    if(resourceName == RESOURCE_ENERGY && energyAvailable < 10000) {
                         continue;
                     }
-                    console.log(resourceName, room.terminal.store[resourceName])
+                    console.log("[terminal", room.name + "]", resourceName, room.terminal.store[resourceName])
                     tradeAmount = Math.min(room.terminal.store[resourceName], 200);
                     orders = Game.market.getAllOrders(order => order.resourceType == resourceName 
                                                                 && order.type == ORDER_BUY
+                                                                && order.price >= market_pricing[order.resourceType]
                                                                 && Game.market.calcTransactionCost(tradeAmount, room.name, order.roomName) < Math.min(energyAvailable, tradeAmount * 1));
                     //console.log(JSON.stringify(orders));
-                    //orders.sort(function(a,b) { return Game.market.calcTransactionCost(200, room.name, b.roomName) - Game.market.calcTransactionCost(200, room.name, a.roomName); })
-                    orders.sort(function(a,b) { return b.price - a.price; })
-                    //console.log('Best price', orders[0].price, Game.market.calcTransactionCost(200, room.name, orders[0].roomName));
-                    tradeAmount = Math.min(tradeAmount, orders[0].amount);
-                    energyUsed = Game.market.calcTransactionCost(tradeAmount, room.name, orders[0].roomName);
-                    if(Game.market.deal(orders[0].id, tradeAmount, room.name) == OK) {
-                        console.log("Sold", tradeAmount, orders[0].resourceType, "to", orders[0].roomName, "at", orders[0].price, "for", orders[0].price * tradeAmount, "using", energyUsed, "energy");
+                    if(orders.length > 0) {
+                        //orders.sort(function(a,b) { return Game.market.calcTransactionCost(200, room.name, b.roomName) - Game.market.calcTransactionCost(200, room.name, a.roomName); })
+                        orders.sort(function(a,b) { return b.price - a.price; })
+                        //console.log('Best price', orders[0].price, Game.market.calcTransactionCost(200, room.name, orders[0].roomName));
+                        tradeAmount = Math.min(tradeAmount, orders[0].amount);
+                        energyUsed = Game.market.calcTransactionCost(tradeAmount, room.name, orders[0].roomName);
+                        if(Game.market.deal(orders[0].id, tradeAmount, room.name) == OK) {
+                            console.log("[terminal", room.name + "]", "Sold", tradeAmount, orders[0].resourceType, "to", orders[0].roomName, "at", orders[0].price, "for", orders[0].price * tradeAmount, "using", energyUsed, "energy");
+                        }
                     }
                 }
             }
         }
     }
 
-    console.log("End CPU Bucket:", Game.cpu.bucket)
+    if(Game.cpu.bucket < 1000) {
+        console.log("CPU Bucket low:", Game.cpu.bucket)
+    }
 }
