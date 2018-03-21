@@ -87,14 +87,14 @@ var roleRemoteHarvester = {
                 }
             }
 
-            if(creep.memory.home != creep.room.name) {
+            if(creep.memory.home.room != creep.room.name) {
                 creep.moveTo(new RoomPosition(25, 25, creep.memory.home.room), { reusePath: 20 });
                 roads.recordUse(creep.body, creep.pos);
             } else {
                 // Deliver energy
                 var target = common.getCachedObject(creep, 'remoteHarvester_container')
                 if(target == ERR_NOT_FOUND) {
-                    var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (structure) => {
                             return (structure.structureType == STRUCTURE_CONTAINER ||
                                     structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
