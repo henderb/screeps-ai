@@ -5,7 +5,7 @@ var roleContainerizer = {
     /** @param {Spawn} spawn
         @param {int} resources 
     **/
-    create: function(spawn, resources) {
+    create: function(spawn, resources, roomName = spawn.room.name) {
         // Limit resources to build one step above 10/tick source replenishment rate
         resources = Math.min(resources, 850);
         var body = [WORK,CARRY,MOVE];
@@ -21,6 +21,8 @@ var roleContainerizer = {
         var newName = spawn.createCreep(body, undefined, {role: 'containerizer'});
         if(newName < 0) {
             newName = common.getErrorString(newName);
+        } else {
+            Game.creeps[newName].memory.room = roomName;
         }
         console.log(spawn, 'Spawning new containerizer: ' + newName + ' with body ' + body);
     },
@@ -29,6 +31,9 @@ var roleContainerizer = {
     run: function(creep) {
         if(!creep.memory.my_source) {
             var sources = creep.room.find(FIND_SOURCES);
+            if(creep.memory.room) {
+                sources = Game.rooms[creep.memory.room].find(FIND_SOURCES);
+            }
             var sourceIDs = sources.map(function(s){ return s.id; });
             var otherContainerizers = creep.room.find(FIND_MY_CREEPS, {
                 filter: (creep) => {
@@ -56,12 +61,18 @@ var roleContainerizer = {
 	    }
 
 	    if(creep.memory.delivering) {
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_CONTAINER ||
-                            structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
-                }
-            });
+            var target = common.getCached(creep, 'containerizer_container');
+            if(target == ERR_NOT_FOUND) {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return (structure.structureType == STRUCTURE_CONTAINER ||
+                                structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
+                    }
+                });
+                common.setCached(creep, 'containerizer_container', target.id, 100);
+            } else {
+                target = Game.getObjectById(target);
+            }
             if(target) {
                 creep.repair(target);
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -80,6 +91,10 @@ var roleContainerizer = {
                     creep.moveTo(source);
                 }
             }
+        }
+
+        if(creep.memory.room != null && creep.memory.room != creep.room.name) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.room), { reusePath: 20 });
         }
 	}
 };

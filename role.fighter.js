@@ -69,6 +69,10 @@ var roleFighter = {
                 }
             }
 	    }
+
+        if(creep.memory.room != null && creep.memory.room != creep.room.name) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.room), { reusePath: 20 });
+        }
 	}
 };
 

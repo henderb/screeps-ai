@@ -37,15 +37,19 @@ var roleRepairer = {
 	    }
 
 	    if(creep.memory.building) {
-            var target = false;
-            for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 10) {
-                target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return structure.structureType != STRUCTURE_ROAD && structure.hits < structure.hitsMax && structure.hits < maxHits;
+            var target = common.getCachedObject(creep, 'repairer_repairing');
+            if(target == ERR_NOT_FOUND) {
+                target = false;
+                for(var maxHits = 1000; maxHits < 1000000000; maxHits = maxHits * 10) {
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return structure.structureType != STRUCTURE_ROAD && structure.hits < structure.hitsMax && structure.hits < maxHits;
+                        }
+                    });
+                    if(target) {
+                        common.setCachedObject(creep, 'repairer_repairing', target, 20);
+                        break;
                     }
-                });
-                if(target) {
-                    break;
                 }
             }
             if(target) {
@@ -53,7 +57,11 @@ var roleRepairer = {
                     creep.moveTo(target);
                 }
             } else {
-                target = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+                target = common.getCachedObject(creep, 'repairer_building');
+                if(target == ERR_NOT_FOUND) {
+                    target = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+                    common.setCachedObject(creep, 'repairer_building', target, 20);
+                }
                 if(target) {
                     if(creep.build(target) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target);

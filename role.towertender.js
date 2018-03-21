@@ -34,11 +34,15 @@ var roleTowerTender = {
 	    }
 
 	    if(creep.memory.delivering) {
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
-                }
-            });
+            var target = common.getCachedObject(creep, 'towertender_filling');
+            if(target == ERR_NOT_FOUND) {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return (structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                    }
+                });
+                common.setCachedObject(creep, 'towertender_filling', target, 20);
+            }
             if(target) {
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);

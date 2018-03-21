@@ -66,16 +66,18 @@ var roleRemoteHarvester = {
 	    if(creep.memory.delivering) {
 
             // Repair roads
-            target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            target = creep.pos.findInRange(FIND_STRUCTURES, 3, {
                 filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_ROAD && Memory.roads[structure.room.name][structure.pos.x + ',' + structure.pos.y] > 1500)
+                    return (structure.structureType == STRUCTURE_ROAD
+                                && structure.hits < structure.hitsMax
+                                && Memory.roads[structure.room.name][structure.pos.x + ',' + structure.pos.y] > 1500)
                 }
             });
             if(target) {
                 creep.repair(target);
             } else {
                 // Build roads
-                target = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+                target = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3);
                 if(target) {
                     // Don't waste moves going to a build site. It should be building it's own roads.
                     creep.build(target)
@@ -88,22 +90,27 @@ var roleRemoteHarvester = {
             if(creep.memory.home != creep.room.name) {
                 creep.moveTo(new RoomPosition(25, 25, creep.memory.home.room), { reusePath: 20 });
                 roads.recordUse(creep.body, creep.pos);
-            }
-            // Deliver energy
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_CONTAINER ||
-                            structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
+            } else {
+                // Deliver energy
+                var target = common.getCachedObject(creep, 'remoteHarvester_container')
+                if(target == ERR_NOT_FOUND) {
+                    var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return (structure.structureType == STRUCTURE_CONTAINER ||
+                                    structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
+                        }
+                    });
+                    common.setCachedObject(creep, 'remoteHarvester_container', target, 100);
                 }
-            });
-            if(target) {
-                creep.repair(target);
-                currentEnergy = creep.carry[RESOURCE_ENERGY];
-                if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
-                    roads.recordUse(creep.body, creep.pos);
-                } else {
-                    creep.memory.benefit += currentEnergy;
+                if(target) {
+                    creep.repair(target);
+                    currentEnergy = creep.carry[RESOURCE_ENERGY];
+                    if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                        roads.recordUse(creep.body, creep.pos);
+                    } else {
+                        creep.memory.benefit += currentEnergy;
+                    }
                 }
             }
         } else {
