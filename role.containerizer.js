@@ -61,7 +61,7 @@ var roleContainerizer = {
 	    }
 
 	    if(creep.memory.delivering) {
-            var target = common.getCached(creep, 'containerizer_container');
+            var target = common.getCachedObject(creep, 'containerizer_container');
             if(target == ERR_NOT_FOUND) {
                 target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure) => {
@@ -69,7 +69,7 @@ var roleContainerizer = {
                                 structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
                     }
                 });
-                common.setCached(creep, 'containerizer_container', target.id, 100);
+                common.setCachedObject(creep, 'containerizer_container', target, 100);
             } else {
                 target = Game.getObjectById(target);
             }
